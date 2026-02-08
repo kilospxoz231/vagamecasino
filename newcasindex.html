@@ -1572,43 +1572,6 @@ body.theme-neon{--blue:#FF006E;--blue-hover:#D4005C;--bg-primary:#0D0D1A;--bg-se
 </div>
 
 <!-- ===== PROFILE ===== -->
-<div class="page" id="page-profile">
-  <div class="profile-header">
-    <img class="profile-avatar" id="profileAvatar" src="" alt="">
-    <div class="profile-name" id="profileName">...</div>
-    <div class="profile-id">ID: <span id="profileId">...</span></div>
-  </div>
-  <div class="profile-stats">
-    <div class="profile-stat"><div class="label">Баланс</div><div class="value" id="profileBalance">0</div></div>
-    <div class="profile-stat"><div class="label">Пополнено</div><div class="value" id="profileDeposited">0</div></div>
-    <div class="profile-stat"><div class="label">Выведено</div><div class="value" id="profileWithdrawn">0</div></div>
-    <div class="profile-stat"><div class="label">Поставлено</div><div class="value" id="profileWagered">0</div></div>
-    <div class="profile-stat"><div class="label">Всего игр</div><div class="value" id="profileGames">0</div></div>
-    <div class="profile-stat"><div class="label">Выиграно</div><div class="value" id="profileWon">0</div></div>
-  </div>
-  <div class="ref-section">
-    <div class="ref-title">🫂 Реферальная система</div>
-    <p style="font-size:13px;color:var(--text-secondary);margin-bottom:12px">Приглашайте друзей и получайте <b style="color:var(--green)">10%</b> от каждого их депозита!</p>
-    <div class="ref-link-row">
-      <input type="text" class="ref-link-input" id="refLinkInput" readonly value="...">
-      <button class="ref-copy-btn" onclick="copyRefLink()"><i class="fas fa-copy"></i></button>
-    </div>
-    <div class="ref-stats">
-      <div class="ref-stat"><div class="value" id="refCount">0</div><div class="label">Рефералов</div></div>
-      <div class="ref-stat"><div class="value" id="refEarned">0</div><div class="label">Заработано</div></div>
-      <div class="ref-stat"><div class="value" id="refAvailable">0</div><div class="label">Доступно</div></div>
-    </div>
-    <button class="btn btn-green" onclick="withdrawRef()">Вывести на баланс</button>
-  </div>
-  <div class="promo-section">
-    <div class="section-title" style="margin-bottom:12px"><span class="icon">🎁</span> Промокод</div>
-    <div class="promo-input-row">
-      <input type="text" class="promo-input" id="promoInput" placeholder="Введите промокод...">
-      <button class="promo-btn" onclick="activatePromo()"><i class="fas fa-check"></i></button>
-    </div>
-  </div>
-  <button class="btn btn-primary" onclick="openPage('wallet')" style="margin-bottom:16px">💳 Кошелёк</button>
-</div>
 
 <!-- ===== FAIR ===== -->
 <div class="page" id="page-fair">
@@ -1643,6 +1606,23 @@ body.theme-neon{--blue:#FF006E;--blue-hover:#D4005C;--bg-primary:#0D0D1A;--bg-se
 </div>
 
 </div><!-- /main-wrapper -->
+
+<!-- LEADERBOARD OVERLAY -->
+<div class="modal-overlay" id="leaderboardOverlay" onclick="if(event.target===this)closeLeaderboard()">
+  <div class="modal-content" style="max-width:500px;max-height:80vh;overflow-y:auto">
+    <button class="modal-close" onclick="closeLeaderboard()">✕</button>
+    <div class="modal-title">🏆 Лидерборд</div>
+    <div class="lb-tabs">
+      <button class="lb-tab active" onclick="loadLeaderboard('balance',this)">💰 Баланс</button>
+      <button class="lb-tab" onclick="loadLeaderboard('level',this)">⚡ Уровень</button>
+      <button class="lb-tab" onclick="loadLeaderboard('wagered',this)">🏅 Вейджер</button>
+    </div>
+    <div id="lbList" style="padding:12px"></div>
+  </div>
+</div>
+
+<!-- CONFETTI CONTAINER -->
+<div class="confetti-container" id="confettiContainer"></div>
 
 <!-- NAVBAR -->
 <nav class="navbar">
@@ -1693,6 +1673,9 @@ const S = {
   // locks
   _btnLocks: new Set(),
 };
+
+// Backward compatibility for SOUNDS variable
+let SOUNDS = localStorage.getItem('sounds') !== 'false';
 
 /* ===== DICE COEFFICIENTS ===== */
 const DICE_DATA = {
@@ -2039,136 +2022,7 @@ function initTelegramWebApp() {
 }
 
 /* ================================================================
-   UPDATED NAVIGATION (with active indicator line)
-   ================================================================ */
-function openPage(p) {
-    document.querySelectorAll('.page').forEach(pg => pg.classList.remove('active'));
-    const id = 'page-' + p;
-    const el = document.getElementById(id);
-    if (el) el.classList.add('active');
-
-    // Update navbar
-    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-    document.querySelectorAll('.nav-item').forEach(n => {
-        if (n.dataset.section === p) n.classList.add('active');
-    });
-
-    // Load data for specific pages
-    if (p === 'profile') {
-        send({ type: 'getProfile' });
-        send({ type: 'getLevelInfo' });
-        loadGameHistory();
-    }
-}
-window.openPage = openPage;
-
-/* ================================================================
-   UPDATED WELCOME HANDLER
-   ================================================================ */
-function handleWelcome(m) {
-    setProfile(m);
-
-    // Level
-    if (m.level !== undefined) {
-        updateLevelDisplay(m.level, m.exp, m.exp_needed);
-    }
-
-    // Cashback
-    if (m.cashback !== undefined) {
-        const cbEl = document.getElementById('cashbackAmount');
-        if (cbEl) cbEl.textContent = m.cashback;
-    }
-
-    // Event
-    if (m.event) {
-        displayEvent(m.event);
-    }
-
-    // Admin panel
-    if (m.role === 1) {
-        const ap = document.getElementById('adminPanel');
-        if (ap) ap.style.display = 'block';
-    }
-
-    // Active mines
-    if (m.activeMines) {
-        initMinesGrid();
-        restoreMinesState(m.activeMines);
-    } else {
-        initMinesGrid();
-    }
-
-    renderX50Init(m.x50_history || []);
-
-    // Hide preloader
-    document.getElementById('preloader').style.display = 'none';
-
-    showToast('Подключение установлено', 'success');
-
-    // Apply saved language
-    setLanguage(currentLang);
-}
-
-/* ================================================================
-   UPDATED MESSAGE ROUTER — add new cases
-   ================================================================ */
-// Add these to the switch(m.type) inside socket.on('message'):
-// Find the existing switch and add these cases:
-
-const _originalMessageHandler = socket.listeners('message')[0];
-socket.off('message');
-socket.on('message', (m) => {
-    if (!m || !m.type) return;
-    switch(m.type) {
-        case 'welcome': handleWelcome(m); break;
-        case 'updateBalance': updateBalance(m.balance); break;
-        case 'alert': notify(m.type_alert, m.alert_message); break;
-        case 'createMines': serverCreateMines(m); break;
-        case 'playMines': serverPlayMines(m); break;
-        case 'cashoutMines': serverCashoutMines(m); break;
-        case 'minesCheckResult': serverMinesCheck(m); break;
-        case 'betCubeResult': serverDiceResult(m); break;
-        case 'diceCheckResult': serverDiceCheck(m); break;
-        case 'coinflipResult': serverCoinflipResult(m); break;
-        case 'slotsResult': serverSlotsResult(m); break;
-        case 'caseResult': serverCaseResult(m); break;
-        case 'depositInvoice': showDepositInvoice(m); break;
-        case 'depositSuccess': onDepositSuccess(m); break;
-        case 'withdrawSuccess': showToast('Заявка на вывод создана!', 'success'); updateBalance(m.balance); break;
-        case 'withdrawCancelled': showToast('Вывод отменён', 'info'); updateBalance(m.balance); break;
-        case 'refWithdrawSuccess': onRefWithdrawSuccess(m); break;
-        case 'promoSuccess': onPromoSuccess(m); break;
-        case 'historyTransactions': renderHistory(m.history); break;
-        case 'profileData': renderProfileData(m); break;
-        case 'rollX50': handleX50Roll(m); break;
-        case 'addBetX50': addX50BetToUI(m.bet); break;
-        case 'resetX50': resetX50UI(); break;
-        case 'setTimesX50': updateX50Timer(m); break;
-        case 'x50History': renderX50History(m.history); break;
-        case 'x50CheckResult': showFairResult(m); break;
-        case 'fairResult': showFairResult(m); break;
-        // === NEW TYPES ===
-        case 'levelInfo': updateLevelDisplay(m.level, m.exp, m.exp_needed); break;
-        case 'cashbackClaimed':
-            updateBalance(m.balance);
-            document.getElementById('cashbackAmount').textContent = '0';
-            spawnConfetti();
-            break;
-        case 'leaderboardData': renderLeaderboard(m); break;
-        case 'gameHistory': renderGameHistory(m.history); break;
-        case 'eventData': displayEvent(m.event); break;
-        case 'shareStatsData': handleShareData(m); break;
-        case 'adminStats': renderAdminStats(m); break;
-        case 'adminPromoCreated':
-            showToast('Промокод: ' + m.code, 'success', 8000);
-            try { navigator.clipboard.writeText(m.code); } catch(e){}
-            break;
-        default: break;
-    }
-});
-
-/* ================================================================
-   UPDATED PROFILE RENDER (with level info request)
+   NEW MESSAGE TYPES (merged into main router below)
    ================================================================ */
 function renderProfileData(m) {
     // Original profile data
@@ -2407,6 +2261,15 @@ socket.on('message', (m)=>{
     x50History: m=>renderX50History(m.history),
     x50CheckResult: onFairResult,
     fairResult: onFairResult,
+    // NEW MESSAGE TYPES
+    levelInfo: m=>updateLevelDisplay(m.level, m.exp, m.exp_needed),
+    cashbackClaimed: m=>{ updateBalance(m.balance); setText('cashbackAmount','0'); spawnConfetti(); },
+    leaderboardData: renderLeaderboard,
+    gameHistory: m=>renderGameHistory(m.history),
+    eventData: m=>displayEvent(m.event),
+    shareStatsData: handleShareData,
+    adminStats: renderAdminStats,
+    adminPromoCreated: m=>{ notify('success',`Промокод: ${m.code}`, 8000); try{navigator.clipboard.writeText(m.code)}catch(e){} },
   };
   const fn = handlers[m.type];
   if(fn) fn(m);
@@ -2418,29 +2281,60 @@ function handleWelcome(m){
   S.tgId = m.tg_id;
   S.wager = m.wager || 0;
   updateBalance(m.balance);
+  
   // avatar
   const av = m.avatar ? (m.avatar.startsWith('http') ? m.avatar : SOCKET_URL+'/'+m.avatar) : '';
   if(av){ $id('headerAvatar').src=av; $id('profileAvatar').src=av; }
   setText('profileName', m.name||'');
   setText('profileId', m.tg_id||'');
+  
   // ref
   $id('refLinkInput').value = `https://t.me/${BOT_USERNAME}?start=${m.tg_id||''}`;
   setText('refCount', m.refs||0);
   setText('refEarned', m.ref_earned||0);
   setText('refAvailable', m.ref_available||0);
   setText('walletWager', S.wager);
+  
+  // Level
+  if (m.level !== undefined) {
+    updateLevelDisplay(m.level, m.exp, m.exp_needed);
+  }
+  
+  // Cashback
+  if (m.cashback !== undefined) {
+    setText('cashbackAmount', m.cashback);
+  }
+  
+  // Event
+  if (m.event) {
+    displayEvent(m.event);
+  }
+  
+  // Admin panel
+  if (m.role === 1) {
+    const ap = $id('adminPanel');
+    if (ap) ap.style.display = 'block';
+  }
+  
   // x50
   renderX50History(m.x50_history||[]);
   if(m.x50_bets) m.x50_bets.forEach(b=>addX50Bet(b));
+  
   // active mines
   if(m.activeMines) restoreMines(m.activeMines);
   else initMinesGrid();
+  
   // build wheel
   buildX50Wheel();
+  
   // hide preloader
   const pl=$id('preloader');
   pl.classList.add('fade-out');
   setTimeout(()=>pl.style.display='none', 500);
+  
+  // Apply saved language
+  const lang = localStorage.getItem('casino_lang') || 'ru';
+  setLanguage(lang);
 }
 
 /* ===== NAVIGATION ===== */
@@ -2448,12 +2342,20 @@ function openPage(p){
   haptic('light');
   $$('.page').forEach(pg=>pg.classList.remove('active'));
   const el=$id('page-'+p); if(el) el.classList.add('active');
+  
   // navbar
   $$('.nav-item').forEach(n=>n.classList.remove('active'));
-  const navMap = {home:0, x50:1, wallet:2, profile:3};
-  if(navMap[p]!==undefined) $$('.nav-item')[navMap[p]]?.classList.add('active');
+  $$('.nav-item').forEach(n=>{
+    if(n.dataset.section === p) n.classList.add('active');
+  });
+  
   // load profile data if needed
-  if(p==='profile') send({type:'getProfile'});
+  if(p==='profile'){
+    send({type:'getProfile'});
+    send({type:'getLevelInfo'});
+    loadGameHistory();
+  }
+  
   // scroll to top
   window.scrollTo({top:0,behavior:'smooth'});
 }
