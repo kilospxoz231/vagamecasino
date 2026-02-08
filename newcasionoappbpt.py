@@ -117,33 +117,39 @@ def get_db():
 
 def query_one(sql, params=None):
     conn = get_db()
-    cursor = conn.cursor(dictionary=True)
-    cursor.execute(sql, params or [])  # если тут исключение — conn не закроется
-    result = cursor.fetchone()
-    cursor.close()
-    conn.close()
-    return result
+    try:
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute(sql, params or [])
+        result = cursor.fetchone()
+        cursor.close()
+        return result
+    finally:
+        conn.close()
 
 
 def query_all(sql, params=None):
     conn = get_db()
-    cursor = conn.cursor(dictionary=True)
-    cursor.execute(sql, params or [])
-    results = cursor.fetchall()
-    cursor.close()
-    conn.close()
-    return results
+    try:
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute(sql, params or [])
+        results = cursor.fetchall()
+        cursor.close()
+        return results
+    finally:
+        conn.close()
 
 
 def query_exec(sql, params=None):
     conn = get_db()
-    cursor = conn.cursor()
-    cursor.execute(sql, params or [])
-    last_id = cursor.lastrowid
-    conn.commit()
-    cursor.close()
-    conn.close()
-    return last_id
+    try:
+        cursor = conn.cursor()
+        cursor.execute(sql, params or [])
+        last_id = cursor.lastrowid
+        conn.commit()
+        cursor.close()
+        return last_id
+    finally:
+        conn.close()
 
 
 def query_exec_many(queries):
@@ -3370,6 +3376,11 @@ async def admin_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     elif data.startswith('admin_toggle_game_'):
         game_name = data.replace('admin_toggle_game_', '')
+        # Whitelist validation to prevent SQL injection
+        allowed_fields = ['mines', 'cube', 'x50', 'cases_game', 'coinflip', 'slots']
+        if game_name not in allowed_fields:
+            await query.answer('Недопустимое поле', show_alert=True)
+            return
         settings = get_settings()
         if settings and game_name in settings:
             new_val = 0 if settings[game_name] else 1
@@ -3381,6 +3392,11 @@ async def admin_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     elif data.startswith('admin_toggle_fin_'):
         field = data.replace('admin_toggle_fin_', '')
+        # Whitelist validation to prevent SQL injection
+        allowed_fields = ['deposits_enabled', 'withdrawals_enabled']
+        if field not in allowed_fields:
+            await query.answer('Недопустимое поле', show_alert=True)
+            return
         settings = get_settings()
         if settings and field in settings:
             new_val = 0 if settings[field] else 1
