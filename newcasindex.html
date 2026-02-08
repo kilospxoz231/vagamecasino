@@ -1825,24 +1825,10 @@ function toggleFastAnim() {
     showToast(FAST_ANIM ? 'Быстрые анимации включены' : 'Быстрые анимации выключены', 'info');
 }
 
-function toggleSoundSetting() {
-    SOUNDS = !SOUNDS;
-    localStorage.setItem('sounds', SOUNDS ? 'true' : 'false');
-    const btn = document.getElementById('settingSoundToggle');
-    if (btn) btn.classList.toggle('active', SOUNDS);
-    const hdrBtn = document.getElementById('soundBtn');
-    if (hdrBtn) hdrBtn.classList.toggle('active', SOUNDS);
-    showToast(SOUNDS ? 'Звуки включены' : 'Звуки выключены', 'info');
-}
 window.toggleFastAnim = toggleFastAnim;
-window.toggleSoundSetting = toggleSoundSetting;
 
 // Restore toggles on load
 (function restoreToggles() {
-    if (SOUNDS) {
-        const s1 = document.getElementById('settingSoundToggle'); if (s1) s1.classList.add('active');
-        const s2 = document.getElementById('soundBtn'); if (s2) s2.classList.add('active');
-    }
     if (FAST_ANIM) {
         const f = document.getElementById('settingFastAnim'); if (f) f.classList.add('active');
     }
