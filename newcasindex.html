@@ -927,7 +927,6 @@ body.theme-neon{--blue:#FF006E;--blue-hover:#D4005C;--bg-primary:#0D0D1A;--bg-se
 .section-title{font-size:1.4em;font-weight:800;margin-bottom:16px;background:var(--gradient-blue);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;text-align:center}
 
 /* ===== NAV ACTIVE INDICATOR ===== */
-.nav-item.active::after{content:'';position:absolute;top:-8px;left:50%;transform:translateX(-50%);width:20px;height:3px;background:var(--blue);border-radius:0 0 3px 3px}
 .nav-item{position:relative}
 
 /* === WIN OVERLAY === */
@@ -1515,6 +1514,11 @@ body.theme-neon{--blue:#FF006E;--blue-hover:#D4005C;--bg-primary:#0D0D1A;--bg-se
     <!-- Wallet Button -->
     <button class="btn-primary" onclick="openPage('wallet')" style="margin-bottom:16px">
         💳 <span data-i18n="wallet">Кошелёк</span>
+    </button>
+
+    <!-- Settings Button -->
+    <button class="btn-primary" onclick="openPage('settings')" style="margin-bottom:16px;background:var(--bg-card);border:1px solid var(--border-color)">
+        ⚙️ Настройки
     </button>
 </div>
 <!-- ===== SLOTS ===== -->
