@@ -2413,9 +2413,10 @@ function openPage(p){
   haptic('light');
   $$('.page').forEach(pg=>pg.classList.remove('active'));
   const el=$id('page-'+p); if(el) el.classList.add('active');
-  // navbar
+  // navbar - map pages to navbar indices
   $$('.nav-item').forEach(n=>n.classList.remove('active'));
-  const navMap = {home:0, x50:1, wallet:1, profile:3, settings:4};
+  // Home=0, Games=1, Leaderboard=2, Profile=3, Settings=4
+  const navMap = {home:0, x50:1, mines:1, dice:1, cases:1, coinflip:1, slots:1, profile:3, settings:4, wallet:3, fair:4};
   if(navMap[p]!==undefined) $$('.nav-item')[navMap[p]]?.classList.add('active');
   // load profile data if needed
   if(p==='profile') {
