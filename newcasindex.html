@@ -1571,45 +1571,6 @@ body.theme-neon{--blue:#FF006E;--blue-hover:#D4005C;--bg-primary:#0D0D1A;--bg-se
   </div>
 </div>
 
-<!-- ===== PROFILE ===== -->
-<div class="page" id="page-profile">
-  <div class="profile-header">
-    <img class="profile-avatar" id="profileAvatar" src="" alt="">
-    <div class="profile-name" id="profileName">...</div>
-    <div class="profile-id">ID: <span id="profileId">...</span></div>
-  </div>
-  <div class="profile-stats">
-    <div class="profile-stat"><div class="label">Баланс</div><div class="value" id="profileBalance">0</div></div>
-    <div class="profile-stat"><div class="label">Пополнено</div><div class="value" id="profileDeposited">0</div></div>
-    <div class="profile-stat"><div class="label">Выведено</div><div class="value" id="profileWithdrawn">0</div></div>
-    <div class="profile-stat"><div class="label">Поставлено</div><div class="value" id="profileWagered">0</div></div>
-    <div class="profile-stat"><div class="label">Всего игр</div><div class="value" id="profileGames">0</div></div>
-    <div class="profile-stat"><div class="label">Выиграно</div><div class="value" id="profileWon">0</div></div>
-  </div>
-  <div class="ref-section">
-    <div class="ref-title">🫂 Реферальная система</div>
-    <p style="font-size:13px;color:var(--text-secondary);margin-bottom:12px">Приглашайте друзей и получайте <b style="color:var(--green)">10%</b> от каждого их депозита!</p>
-    <div class="ref-link-row">
-      <input type="text" class="ref-link-input" id="refLinkInput" readonly value="...">
-      <button class="ref-copy-btn" onclick="copyRefLink()"><i class="fas fa-copy"></i></button>
-    </div>
-    <div class="ref-stats">
-      <div class="ref-stat"><div class="value" id="refCount">0</div><div class="label">Рефералов</div></div>
-      <div class="ref-stat"><div class="value" id="refEarned">0</div><div class="label">Заработано</div></div>
-      <div class="ref-stat"><div class="value" id="refAvailable">0</div><div class="label">Доступно</div></div>
-    </div>
-    <button class="btn btn-green" onclick="withdrawRef()">Вывести на баланс</button>
-  </div>
-  <div class="promo-section">
-    <div class="section-title" style="margin-bottom:12px"><span class="icon">🎁</span> Промокод</div>
-    <div class="promo-input-row">
-      <input type="text" class="promo-input" id="promoInput" placeholder="Введите промокод...">
-      <button class="promo-btn" onclick="activatePromo()"><i class="fas fa-check"></i></button>
-    </div>
-  </div>
-  <button class="btn btn-primary" onclick="openPage('wallet')" style="margin-bottom:16px">💳 Кошелёк</button>
-</div>
-
 <!-- ===== FAIR ===== -->
 <div class="page" id="page-fair">
   <div class="section-title"><span class="icon">🛡️</span> Честная Игра</div>
@@ -2110,64 +2071,6 @@ function handleWelcome(m) {
 }
 
 /* ================================================================
-   UPDATED MESSAGE ROUTER — add new cases
-   ================================================================ */
-// Add these to the switch(m.type) inside socket.on('message'):
-// Find the existing switch and add these cases:
-
-const _originalMessageHandler = socket.listeners('message')[0];
-socket.off('message');
-socket.on('message', (m) => {
-    if (!m || !m.type) return;
-    switch(m.type) {
-        case 'welcome': handleWelcome(m); break;
-        case 'updateBalance': updateBalance(m.balance); break;
-        case 'alert': notify(m.type_alert, m.alert_message); break;
-        case 'createMines': serverCreateMines(m); break;
-        case 'playMines': serverPlayMines(m); break;
-        case 'cashoutMines': serverCashoutMines(m); break;
-        case 'minesCheckResult': serverMinesCheck(m); break;
-        case 'betCubeResult': serverDiceResult(m); break;
-        case 'diceCheckResult': serverDiceCheck(m); break;
-        case 'coinflipResult': serverCoinflipResult(m); break;
-        case 'slotsResult': serverSlotsResult(m); break;
-        case 'caseResult': serverCaseResult(m); break;
-        case 'depositInvoice': showDepositInvoice(m); break;
-        case 'depositSuccess': onDepositSuccess(m); break;
-        case 'withdrawSuccess': showToast('Заявка на вывод создана!', 'success'); updateBalance(m.balance); break;
-        case 'withdrawCancelled': showToast('Вывод отменён', 'info'); updateBalance(m.balance); break;
-        case 'refWithdrawSuccess': onRefWithdrawSuccess(m); break;
-        case 'promoSuccess': onPromoSuccess(m); break;
-        case 'historyTransactions': renderHistory(m.history); break;
-        case 'profileData': renderProfileData(m); break;
-        case 'rollX50': handleX50Roll(m); break;
-        case 'addBetX50': addX50BetToUI(m.bet); break;
-        case 'resetX50': resetX50UI(); break;
-        case 'setTimesX50': updateX50Timer(m); break;
-        case 'x50History': renderX50History(m.history); break;
-        case 'x50CheckResult': showFairResult(m); break;
-        case 'fairResult': showFairResult(m); break;
-        // === NEW TYPES ===
-        case 'levelInfo': updateLevelDisplay(m.level, m.exp, m.exp_needed); break;
-        case 'cashbackClaimed':
-            updateBalance(m.balance);
-            document.getElementById('cashbackAmount').textContent = '0';
-            spawnConfetti();
-            break;
-        case 'leaderboardData': renderLeaderboard(m); break;
-        case 'gameHistory': renderGameHistory(m.history); break;
-        case 'eventData': displayEvent(m.event); break;
-        case 'shareStatsData': handleShareData(m); break;
-        case 'adminStats': renderAdminStats(m); break;
-        case 'adminPromoCreated':
-            showToast('Промокод: ' + m.code, 'success', 8000);
-            try { navigator.clipboard.writeText(m.code); } catch(e){}
-            break;
-        default: break;
-    }
-});
-
-/* ================================================================
    UPDATED PROFILE RENDER (with level info request)
    ================================================================ */
 function renderProfileData(m) {
@@ -2407,6 +2310,15 @@ socket.on('message', (m)=>{
     x50History: m=>renderX50History(m.history),
     x50CheckResult: onFairResult,
     fairResult: onFairResult,
+    // New message types
+    levelInfo: m=>updateLevelDisplay(m.level, m.exp, m.exp_needed),
+    cashbackClaimed: m=>{ updateBalance(m.balance); setText('cashbackAmount','0'); spawnConfetti(); },
+    leaderboardData: renderLeaderboard,
+    gameHistory: m=>renderGameHistory(m.history),
+    eventData: m=>displayEvent(m.event),
+    shareStatsData: handleShareData,
+    adminStats: renderAdminStats,
+    adminPromoCreated: m=>{ notify('success',`Промокод: ${m.code}`,8000); try{navigator.clipboard.writeText(m.code)}catch(e){} },
   };
   const fn = handlers[m.type];
   if(fn) fn(m);
@@ -2450,7 +2362,7 @@ function openPage(p){
   const el=$id('page-'+p); if(el) el.classList.add('active');
   // navbar
   $$('.nav-item').forEach(n=>n.classList.remove('active'));
-  const navMap = {home:0, x50:1, wallet:2, profile:3};
+  const navMap = {home:0, wallet:1, profile:2, settings:3};
   if(navMap[p]!==undefined) $$('.nav-item')[navMap[p]]?.classList.add('active');
   // load profile data if needed
   if(p==='profile') send({type:'getProfile'});
