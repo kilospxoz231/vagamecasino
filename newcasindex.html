@@ -1646,8 +1646,9 @@ body.theme-neon{--blue:#FF006E;--blue-hover:#D4005C;--bg-primary:#0D0D1A;--bg-se
 
 <!-- NAVBAR -->
 <nav class="navbar">
-    <a href="#" class="nav-item active" data-section="home" onclick="openPage('home')"><span class="icon" style="font-size:1.5em">🎲</span><span class="label" data-i18n="nav_games">Игры</span></a>
-    <a href="#" class="nav-item" data-section="wallet" onclick="openPage('wallet')"><span class="icon" style="font-size:1.5em">💳</span><span class="label" data-i18n="nav_wallet">Кошелёк</span></a>
+    <a href="#" class="nav-item active" data-section="home" onclick="openPage('home')"><span class="icon" style="font-size:1.5em">🏠</span><span class="label" data-i18n="nav_home">Главная</span></a>
+    <a href="#" class="nav-item" data-section="games" onclick="openPage('x50')"><span class="icon" style="font-size:1.5em">🎮</span><span class="label" data-i18n="nav_games">Игры</span></a>
+    <a href="#" class="nav-item" data-section="leaderboard" onclick="openLeaderboard()"><span class="icon" style="font-size:1.5em">🏆</span><span class="label" data-i18n="nav_leaderboard">Топ</span></a>
     <a href="#" class="nav-item" data-section="profile" onclick="openPage('profile')"><span class="icon" style="font-size:1.5em">👤</span><span class="label" data-i18n="nav_profile">Профиль</span></a>
     <a href="#" class="nav-item" data-section="settings" onclick="openPage('settings')"><span class="icon" style="font-size:1.5em">⚙️</span><span class="label" data-i18n="nav_settings">Настройки</span></a>
 </nav>
@@ -2082,6 +2083,9 @@ function handleWelcome(m) {
     // Event
     if (m.event) {
         displayEvent(m.event);
+    } else {
+        // Request event data if not included in welcome
+        send({type:'getEvent'});
     }
 
     // Admin panel
@@ -2450,10 +2454,18 @@ function openPage(p){
   const el=$id('page-'+p); if(el) el.classList.add('active');
   // navbar
   $$('.nav-item').forEach(n=>n.classList.remove('active'));
-  const navMap = {home:0, x50:1, wallet:2, profile:3};
+  const navMap = {home:0, x50:1, wallet:1, profile:3, settings:4};
   if(navMap[p]!==undefined) $$('.nav-item')[navMap[p]]?.classList.add('active');
   // load profile data if needed
-  if(p==='profile') send({type:'getProfile'});
+  if(p==='profile') {
+    send({type:'getProfile'});
+    loadGameHistory();
+    send({type:'getLevelInfo'});
+  }
+  // load event data on home page
+  if(p==='home') {
+    send({type:'getEvent'});
+  }
   // scroll to top
   window.scrollTo({top:0,behavior:'smooth'});
 }
@@ -3065,6 +3077,7 @@ function onDepositInvoice(m){
     notify('info','Оплатите счёт в открывшемся окне');
   } else notify('error','Ошибка создания счёта');
 }
+window.showDepositInvoice = onDepositInvoice; // alias for socket handler
 
 function doWithdraw(){
   const coins=parseInt($id('withdrawCoins').value||0);
