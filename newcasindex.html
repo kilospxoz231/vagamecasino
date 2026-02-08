@@ -3144,6 +3144,7 @@ function initBanner(){
   // auto-rotate
   setInterval(()=>{idx=(idx+1)%slides.length;render();},5000);
 }
+window.initBannerCarousel = initBanner; // Alias for compatibility
 
 /* ================================================================
    INITIALIZATION
