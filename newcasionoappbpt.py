@@ -129,7 +129,7 @@ def query_one(sql, params=None):
     finally:
         try:
             cursor.close()
-        except:
+        except Exception:
             pass
         conn.close()
 
@@ -144,7 +144,7 @@ def query_all(sql, params=None):
     finally:
         try:
             cursor.close()
-        except:
+        except Exception:
             pass
         conn.close()
 
@@ -160,7 +160,7 @@ def query_exec(sql, params=None):
     finally:
         try:
             cursor.close()
-        except:
+        except Exception:
             pass
         conn.close()
 
