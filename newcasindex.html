@@ -1571,45 +1571,6 @@ body.theme-neon{--blue:#FF006E;--blue-hover:#D4005C;--bg-primary:#0D0D1A;--bg-se
   </div>
 </div>
 
-<!-- ===== PROFILE ===== -->
-<div class="page" id="page-profile">
-  <div class="profile-header">
-    <img class="profile-avatar" id="profileAvatar" src="" alt="">
-    <div class="profile-name" id="profileName">...</div>
-    <div class="profile-id">ID: <span id="profileId">...</span></div>
-  </div>
-  <div class="profile-stats">
-    <div class="profile-stat"><div class="label">Баланс</div><div class="value" id="profileBalance">0</div></div>
-    <div class="profile-stat"><div class="label">Пополнено</div><div class="value" id="profileDeposited">0</div></div>
-    <div class="profile-stat"><div class="label">Выведено</div><div class="value" id="profileWithdrawn">0</div></div>
-    <div class="profile-stat"><div class="label">Поставлено</div><div class="value" id="profileWagered">0</div></div>
-    <div class="profile-stat"><div class="label">Всего игр</div><div class="value" id="profileGames">0</div></div>
-    <div class="profile-stat"><div class="label">Выиграно</div><div class="value" id="profileWon">0</div></div>
-  </div>
-  <div class="ref-section">
-    <div class="ref-title">🫂 Реферальная система</div>
-    <p style="font-size:13px;color:var(--text-secondary);margin-bottom:12px">Приглашайте друзей и получайте <b style="color:var(--green)">10%</b> от каждого их депозита!</p>
-    <div class="ref-link-row">
-      <input type="text" class="ref-link-input" id="refLinkInput" readonly value="...">
-      <button class="ref-copy-btn" onclick="copyRefLink()"><i class="fas fa-copy"></i></button>
-    </div>
-    <div class="ref-stats">
-      <div class="ref-stat"><div class="value" id="refCount">0</div><div class="label">Рефералов</div></div>
-      <div class="ref-stat"><div class="value" id="refEarned">0</div><div class="label">Заработано</div></div>
-      <div class="ref-stat"><div class="value" id="refAvailable">0</div><div class="label">Доступно</div></div>
-    </div>
-    <button class="btn btn-green" onclick="withdrawRef()">Вывести на баланс</button>
-  </div>
-  <div class="promo-section">
-    <div class="section-title" style="margin-bottom:12px"><span class="icon">🎁</span> Промокод</div>
-    <div class="promo-input-row">
-      <input type="text" class="promo-input" id="promoInput" placeholder="Введите промокод...">
-      <button class="promo-btn" onclick="activatePromo()"><i class="fas fa-check"></i></button>
-    </div>
-  </div>
-  <button class="btn btn-primary" onclick="openPage('wallet')" style="margin-bottom:16px">💳 Кошелёк</button>
-</div>
-
 <!-- ===== FAIR ===== -->
 <div class="page" id="page-fair">
   <div class="section-title"><span class="icon">🛡️</span> Честная Игра</div>
