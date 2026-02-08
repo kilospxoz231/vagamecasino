@@ -3175,25 +3175,5 @@ init();
 
 })();
 </script>
-<!-- LEADERBOARD MODAL -->
-<div class="modal-overlay" id="leaderboardOverlay" onclick="if(event.target===this)closeLeaderboard()" style="display:none">
-    <div class="modal-content" style="max-width:550px;padding:0;max-height:80vh;overflow:hidden">
-        <div style="padding:20px 24px;border-bottom:1px solid var(--border-color);display:flex;justify-content:space-between;align-items:center">
-            <h2 style="font-size:1.3em;font-weight:700">🏆 <span data-i18n="leaderboard">Лидерборд</span></h2>
-            <button onclick="closeLeaderboard()" style="font-size:1.5em;cursor:pointer;background:none;border:none;color:var(--text-muted)">✕</button>
-        </div>
-        <div class="lb-tabs">
-            <button class="lb-tab active" onclick="loadLeaderboard('balance',this)" data-i18n="lb_balance">💰 Баланс</button>
-            <button class="lb-tab" onclick="loadLeaderboard('level',this)" data-i18n="lb_level">⚡ Уровень</button>
-            <button class="lb-tab" onclick="loadLeaderboard('wagered',this)" data-i18n="lb_wagered">🏅 Вейджер</button>
-        </div>
-        <div class="lb-list" id="lbList" style="padding:12px;max-height:50vh;overflow-y:auto">
-            <p style="text-align:center;color:var(--text-muted);padding:20px" data-i18n="loading">Загрузка...</p>
-        </div>
-    </div>
-</div>
-
-<!-- CONFETTI -->
-<div class="confetti-container" id="confettiContainer"></div>
 </body>
 </html>
