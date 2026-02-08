@@ -1872,6 +1872,7 @@ function updateLevelDisplay(level, exp, expNeeded) {
    CASHBACK
    ================================================================ */
 function claimCashback() {
+    haptic('light');
     send({ type: 'claimCashback' });
 }
 window.claimCashback = claimCashback;
@@ -3168,15 +3169,6 @@ function onLevelUp(m){
   const expBar = $id('expBar');
   if(expBar) expBar.style.width = '0%';
 }
-
-/* ================================================================
-   CASHBACK
-   ================================================================ */
-function claimCashback(){
-  haptic('light');
-  send({type:'claimCashback'});
-}
-window.claimCashback = claimCashback;
 
 function onCashbackClaimed(m){
   if(m.error){
