@@ -2263,13 +2263,17 @@ socket.on('message', (m)=>{
     fairResult: onFairResult,
     // NEW MESSAGE TYPES
     levelInfo: m=>updateLevelDisplay(m.level, m.exp, m.exp_needed),
-    cashbackClaimed: m=>{ updateBalance(m.balance); setText('cashbackAmount','0'); spawnConfetti(); },
+    cashbackClaimed: m=>{ 
+      updateBalance(m.balance); 
+      setText('cashbackAmount','0'); 
+      spawnConfetti(); 
+    },
     leaderboardData: renderLeaderboard,
     gameHistory: m=>renderGameHistory(m.history),
     eventData: m=>displayEvent(m.event),
     shareStatsData: handleShareData,
     adminStats: renderAdminStats,
-    adminPromoCreated: m=>{ notify('success',`Промокод: ${m.code}`, 8000); try{navigator.clipboard.writeText(m.code)}catch(e){} },
+    adminPromoCreated: m=>{ notify('success',`Промокод: ${m.code}`, 8000); try{navigator.clipboard.writeText(m.code).catch(()=>{})}catch(e){} },
   };
   const fn = handlers[m.type];
   if(fn) fn(m);
