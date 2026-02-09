@@ -41,6 +41,10 @@ SITE_URL = "https://vigame1x2.ru/newcasino/"
 CRYPTOBOT_TOKEN = "528416:AAAfAsJnFTI7vxSIdXEp2aWvDY9GWX3geER"
 COINS_PER_USD = 100  # 100 монет = $1
 
+# Security whitelists for admin SQL queries
+ALLOWED_GAME_SETTINGS = {'mines', 'cube', 'x50', 'cases_game', 'coinflip', 'slots'}
+ALLOWED_FIN_SETTINGS = {'deposits_enabled', 'withdrawals_enabled'}
+
 DB_CONFIG = {
     'host': 'mysql18.hostland.ru',
     'user': 'host1884970',
