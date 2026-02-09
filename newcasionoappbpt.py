@@ -41,6 +41,10 @@ SITE_URL = "https://vigame1x2.ru/newcasino/"
 CRYPTOBOT_TOKEN = "528416:AAAfAsJnFTI7vxSIdXEp2aWvDY9GWX3geER"
 COINS_PER_USD = 100  # 100 монет = $1
 
+# Security whitelists for admin SQL queries
+ALLOWED_GAME_SETTINGS = {'mines', 'cube', 'x50', 'cases_game', 'coinflip', 'slots'}
+ALLOWED_FIN_SETTINGS = {'deposits_enabled', 'withdrawals_enabled'}
+
 DB_CONFIG = {
     'host': 'mysql18.hostland.ru',
     'user': 'host1884970',
@@ -117,33 +121,48 @@ def get_db():
 
 def query_one(sql, params=None):
     conn = get_db()
-    cursor = conn.cursor(dictionary=True)
-    cursor.execute(sql, params or [])  # если тут исключение — conn не закроется
-    result = cursor.fetchone()
-    cursor.close()
-    conn.close()
-    return result
+    try:
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute(sql, params or [])
+        result = cursor.fetchone()
+        return result
+    finally:
+        try:
+            cursor.close()
+        except Exception:
+            pass
+        conn.close()
 
 
 def query_all(sql, params=None):
     conn = get_db()
-    cursor = conn.cursor(dictionary=True)
-    cursor.execute(sql, params or [])
-    results = cursor.fetchall()
-    cursor.close()
-    conn.close()
-    return results
+    try:
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute(sql, params or [])
+        results = cursor.fetchall()
+        return results
+    finally:
+        try:
+            cursor.close()
+        except Exception:
+            pass
+        conn.close()
 
 
 def query_exec(sql, params=None):
     conn = get_db()
-    cursor = conn.cursor()
-    cursor.execute(sql, params or [])
-    last_id = cursor.lastrowid
-    conn.commit()
-    cursor.close()
-    conn.close()
-    return last_id
+    try:
+        cursor = conn.cursor()
+        cursor.execute(sql, params or [])
+        last_id = cursor.lastrowid
+        conn.commit()
+        return last_id
+    finally:
+        try:
+            cursor.close()
+        except Exception:
+            pass
+        conn.close()
 
 
 def query_exec_many(queries):
@@ -3370,6 +3389,10 @@ async def admin_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     elif data.startswith('admin_toggle_game_'):
         game_name = data.replace('admin_toggle_game_', '')
+        # Whitelist validation to prevent SQL injection
+        if game_name not in ALLOWED_GAME_SETTINGS:
+            await query.answer('❌ Недопустимое значение', show_alert=True)
+            return
         settings = get_settings()
         if settings and game_name in settings:
             new_val = 0 if settings[game_name] else 1
@@ -3381,6 +3404,10 @@ async def admin_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     elif data.startswith('admin_toggle_fin_'):
         field = data.replace('admin_toggle_fin_', '')
+        # Whitelist validation to prevent SQL injection
+        if field not in ALLOWED_FIN_SETTINGS:
+            await query.answer('❌ Недопустимое значение', show_alert=True)
+            return
         settings = get_settings()
         if settings and field in settings:
             new_val = 0 if settings[field] else 1

@@ -891,12 +891,11 @@ input[type=number]{-moz-appearance:textfield}
 .lb-tabs{display:flex;border-bottom:1px solid var(--border-color)}
 .lb-tab{flex:1;padding:14px;text-align:center;font-weight:600;cursor:pointer;color:var(--text-muted);border:none;background:none;font-size:0.95em;border-bottom:2px solid transparent;font-family:inherit}
 .lb-tab.active{color:var(--blue);border-bottom-color:var(--blue)}
-.lb-item{display:flex;align-items:center;gap:12px;padding:12px;border-radius:12px;margin-bottom:6px}
-.lb-item:hover{background:var(--bg-card)}
-.lb-rank{width:32px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:50%;font-weight:800;font-size:0.9em;background:var(--bg-input);color:var(--text-muted)}
-.lb-rank.top-1{background:linear-gradient(135deg,#FFD700,#FFA500);color:#fff}
-.lb-rank.top-2{background:linear-gradient(135deg,#C0C0C0,#A0A0A0);color:#fff}
-.lb-rank.top-3{background:linear-gradient(135deg,#CD7F32,#A0522D);color:#fff}
+.lb-item{display:flex;align-items:center;gap:12px;padding:14px 16px;border-radius:12px;margin-bottom:6px;background:var(--bg-card);border:1px solid var(--border-color)}
+.lb-item:hover{background:var(--bg-card-hover);border-color:var(--border-hover)}
+.lb-rank{width:36px;height:36px;display:flex;align-items:center;justify-content:center;border-radius:50%;font-weight:800;font-size:1.1em;background:var(--bg-input);flex-shrink:0}
+.lb-name{flex:1;font-weight:600;font-size:0.95em}
+.lb-value{font-weight:800;font-size:1em;color:var(--blue)}
 
 /* ===== THEMES ===== */
 body.theme-blue{--blue:#2AABEE;--blue-hover:#1B8AD4;--bg-primary:#17212B;--bg-secondary:#1E2C3A;--bg-card:#253443;--bg-input:#293A4C;--border-color:#293A4C;--text-muted:#708499;--gradient-blue:linear-gradient(135deg,#2AABEE,#1B8AD4)}
@@ -909,12 +908,12 @@ body.theme-neon{--blue:#FF006E;--blue-hover:#D4005C;--bg-primary:#0D0D1A;--bg-se
 .toast{pointer-events:all;display:flex;align-items:flex-start;gap:12px;padding:14px 18px;border-radius:var(--radius);background:var(--bg-card);border:1px solid var(--border-color);box-shadow:0 8px 30px rgba(0,0,0,0.3);backdrop-filter:blur(20px);animation:toastIn 0.4s cubic-bezier(0.34,1.56,0.64,1) forwards;position:relative;overflow:hidden;cursor:pointer}
 .toast:hover{transform:translateX(-4px)}.toast.removing{animation:toastOut 0.3s ease forwards}
 .toast::before{content:'';position:absolute;left:0;top:0;width:4px;height:100%;border-radius:4px 0 0 4px}
-.toast.toast-success::before{background:var(--green)}.toast.toast-error::before{background:var(--red)}.toast.toast-info::before{background:var(--blue)}
+.toast.toast-success::before{background:var(--green)}.toast.toast-error::before{background:var(--red)}.toast.toast-info::before{background:var(--blue)}.toast.toast-warning::before{background:var(--yellow)}
 .toast-icon{font-size:1.5em;flex-shrink:0}.toast-body{flex:1;min-width:0}
 .toast-title{font-weight:700;font-size:0.95em;margin-bottom:3px}.toast-message{font-size:0.85em;color:var(--text-secondary);line-height:1.4}
 .toast-close{position:absolute;top:8px;right:10px;background:none;border:none;color:var(--text-muted);font-size:1.1em;cursor:pointer;opacity:0.5}
 .toast-progress{position:absolute;bottom:0;left:0;height:3px;border-radius:0 0 0 14px;animation:toastProgress linear forwards}
-.toast.toast-success .toast-progress{background:var(--green)}.toast.toast-error .toast-progress{background:var(--red)}.toast.toast-info .toast-progress{background:var(--blue)}
+.toast.toast-success .toast-progress{background:var(--green)}.toast.toast-error .toast-progress{background:var(--red)}.toast.toast-info .toast-progress{background:var(--blue)}.toast.toast-warning .toast-progress{background:var(--yellow)}
 @keyframes toastIn{0%{opacity:0;transform:translateX(100%) scale(0.8)}100%{opacity:1;transform:translateX(0) scale(1)}}
 @keyframes toastOut{0%{opacity:1;transform:translateX(0) scale(1)}100%{opacity:0;transform:translateX(100%) scale(0.8)}}
 @keyframes toastProgress{0%{width:100%}100%{width:0%}}
@@ -928,7 +927,6 @@ body.theme-neon{--blue:#FF006E;--blue-hover:#D4005C;--bg-primary:#0D0D1A;--bg-se
 .section-title{font-size:1.4em;font-weight:800;margin-bottom:16px;background:var(--gradient-blue);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;text-align:center}
 
 /* ===== NAV ACTIVE INDICATOR ===== */
-.nav-item.active::after{content:'';position:absolute;top:-8px;left:50%;transform:translateX(-50%);width:20px;height:3px;background:var(--blue);border-radius:0 0 3px 3px}
 .nav-item{position:relative}
 
 /* === WIN OVERLAY === */
@@ -1070,15 +1068,41 @@ body.theme-neon{--blue:#FF006E;--blue-hover:#D4005C;--bg-primary:#0D0D1A;--bg-se
     <div class="banner-dots" id="bannerDots"></div>
   </div>
 
-  <div class="section-title"><span class="icon">💎</span> Игры</div>
-    <!-- Event Banner -->
-    <div class="event-section" id="eventSection" style="display:none;margin-bottom:20px">
-        <div class="event-container" id="eventContainer">
-            <h3 id="eventName" style="font-size:1.4em;font-weight:800;margin-bottom:8px"></h3>
-            <p id="eventDescription" style="font-size:0.95em;color:var(--text-secondary);margin-bottom:8px"></p>
-            <p id="eventTime" style="font-size:0.85em;color:var(--text-muted)"></p>
-        </div>
+  <!-- Event Banner -->
+  <div class="event-section" id="eventSection" style="display:none;margin-bottom:20px">
+      <div class="event-container" id="eventContainer">
+          <h3 id="eventName" style="font-size:1.4em;font-weight:800;margin-bottom:8px"></h3>
+          <p id="eventDescription" style="font-size:0.95em;color:var(--text-secondary);margin-bottom:8px"></p>
+          <p id="eventTime" style="font-size:0.85em;color:var(--text-muted)"></p>
+      </div>
+  </div>
+
+  <div class="section-title"><span class="icon">🏠</span> Главная</div>
+  
+  <div style="display:grid;gap:12px;margin-bottom:16px">
+    <div style="background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--radius);padding:20px;text-align:center">
+      <div style="font-size:2em;margin-bottom:8px">🎮</div>
+      <h3 style="font-size:1.2em;font-weight:700;margin-bottom:8px">Добро пожаловать!</h3>
+      <p style="color:var(--text-secondary);font-size:0.9em;margin-bottom:16px">Играйте в проверенные честные игры</p>
+      <button class="btn-primary" onclick="openPage('games')" style="padding:10px 24px">Начать играть 🎲</button>
     </div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:16px">
+    <div style="background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--radius);padding:16px;cursor:pointer" onclick="openPage('wallet')">
+      <div style="font-size:1.5em;margin-bottom:4px">💰</div>
+      <div style="font-size:0.85em;color:var(--text-muted)">Кошелёк</div>
+    </div>
+    <div style="background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--radius);padding:16px;cursor:pointer" onclick="openPage('leaderboard')">
+      <div style="font-size:1.5em;margin-bottom:4px">🏆</div>
+      <div style="font-size:0.85em;color:var(--text-muted)">Рейтинг</div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== GAMES PAGE ===== -->
+<div class="page" id="page-games">
+  <div class="section-title"><span class="icon">🎮</span> Игры</div>
   <div class="games-grid">
     <div class="game-card" data-game="x50" onclick="openPage('x50')">
       <div class="game-card-img">🎡</div>
@@ -1257,6 +1281,22 @@ body.theme-neon{--blue:#FF006E;--blue-hover:#D4005C;--bg-primary:#0D0D1A;--bg-se
     </div>
   </div>
 </div>
+
+<!-- ===== LEADERBOARD PAGE ===== -->
+<div class="page" id="page-leaderboard">
+  <div class="section-title"><span class="icon">🏆</span> Рейтинг</div>
+  
+  <div class="lb-tabs">
+    <button class="lb-tab active" data-lb="balance" onclick="switchLeaderboard('balance')">💰 Баланс</button>
+    <button class="lb-tab" data-lb="wagered" onclick="switchLeaderboard('wagered')">🏅 Ставки</button>
+    <button class="lb-tab" data-lb="level" onclick="switchLeaderboard('level')">⚡ Уровень</button>
+  </div>
+
+  <div id="leaderboardContent" style="margin-top:16px">
+    <p style="text-align:center;color:var(--text-muted);padding:32px 16px">Загрузка...</p>
+  </div>
+</div>
+
 <!-- ========== PAGE: SETTINGS ========== -->
 <div class="page" id="page-settings">
     <div class="section-title">⚙️ Настройки</div>
@@ -1475,6 +1515,11 @@ body.theme-neon{--blue:#FF006E;--blue-hover:#D4005C;--bg-primary:#0D0D1A;--bg-se
     <button class="btn-primary" onclick="openPage('wallet')" style="margin-bottom:16px">
         💳 <span data-i18n="wallet">Кошелёк</span>
     </button>
+
+    <!-- Settings Button -->
+    <button class="btn-primary" onclick="openPage('settings')" style="margin-bottom:16px;background:var(--bg-card);border:1px solid var(--border-color)">
+        ⚙️ Настройки
+    </button>
 </div>
 <!-- ===== SLOTS ===== -->
 <div class="page" id="page-slots">
@@ -1626,10 +1671,11 @@ body.theme-neon{--blue:#FF006E;--blue-hover:#D4005C;--bg-primary:#0D0D1A;--bg-se
 
 <!-- NAVBAR -->
 <nav class="navbar">
-    <a href="#" class="nav-item active" data-section="home" onclick="openPage('home')"><span class="icon" style="font-size:1.5em">🎲</span><span class="label" data-i18n="nav_games">Игры</span></a>
-    <a href="#" class="nav-item" data-section="wallet" onclick="openPage('wallet')"><span class="icon" style="font-size:1.5em">💳</span><span class="label" data-i18n="nav_wallet">Кошелёк</span></a>
-    <a href="#" class="nav-item" data-section="profile" onclick="openPage('profile')"><span class="icon" style="font-size:1.5em">👤</span><span class="label" data-i18n="nav_profile">Профиль</span></a>
-    <a href="#" class="nav-item" data-section="settings" onclick="openPage('settings')"><span class="icon" style="font-size:1.5em">⚙️</span><span class="label" data-i18n="nav_settings">Настройки</span></a>
+    <a href="#" class="nav-item active" data-section="home" onclick="openPage('home')"><span class="icon" style="font-size:1.5em">🏠</span><span class="label">Главная</span></a>
+    <a href="#" class="nav-item" data-section="games" onclick="openPage('games')"><span class="icon" style="font-size:1.5em">🎮</span><span class="label">Игры</span></a>
+    <a href="#" class="nav-item" data-section="wallet" onclick="openPage('wallet')"><span class="icon" style="font-size:1.5em">💰</span><span class="label">Кошелёк</span></a>
+    <a href="#" class="nav-item" data-section="leaderboard" onclick="openPage('leaderboard')"><span class="icon" style="font-size:1.5em">🏆</span><span class="label">Рейтинг</span></a>
+    <a href="#" class="nav-item" data-section="profile" onclick="openPage('profile')"><span class="icon" style="font-size:1.5em">👤</span><span class="label">Профиль</span></a>
 </nav>
 
 <!-- ============================================================
@@ -1838,6 +1884,7 @@ function updateLevelDisplay(level, exp, expNeeded) {
    CASHBACK
    ================================================================ */
 function claimCashback() {
+    haptic('light');
     send({ type: 'claimCashback' });
 }
 window.claimCashback = claimCashback;
@@ -1846,39 +1893,9 @@ window.claimCashback = claimCashback;
    LEADERBOARD
    ================================================================ */
 function openLeaderboard() {
-    document.getElementById('leaderboardOverlay').style.display = 'flex';
-    loadLeaderboard('balance', document.querySelector('.lb-tab'));
-}
-function closeLeaderboard() {
-    document.getElementById('leaderboardOverlay').style.display = 'none';
-}
-function loadLeaderboard(lbType, btn) {
-    document.querySelectorAll('.lb-tab').forEach(t => t.classList.remove('active'));
-    if (btn) btn.classList.add('active');
-    const list = document.getElementById('lbList');
-    list.innerHTML = '<p style="text-align:center;color:var(--text-muted);padding:20px">Загрузка...</p>';
-    send({ type: 'getLeaderboard', lb_type: lbType, limit: 30 });
-}
-function renderLeaderboard(data) {
-    const list = document.getElementById('lbList');
-    if (!data.leaderboard || !data.leaderboard.length) {
-        list.innerHTML = '<p style="text-align:center;color:var(--text-muted);padding:20px">Пусто</p>';
-        return;
-    }
-    const lbType = data.lb_type || 'balance';
-    list.innerHTML = data.leaderboard.map((u, i) => {
-        const rank = i < 3 ? `top-${i+1}` : '';
-        const name = u.name || ('User ' + u.user_id);
-        let val;
-        if (lbType === 'balance') val = u.balance + ' 💰';
-        else if (lbType === 'level') val = 'Ур. ' + u.level;
-        else val = u.total_wagered + ' 💰';
-        return `<div class="lb-item"><div class="lb-rank ${rank}">${i+1}</div><div style="flex:1"><div style="font-weight:700">${name}</div><div style="font-size:0.85em;color:var(--text-muted)">Ур. ${u.level||1}</div></div><div style="font-weight:700;color:var(--blue)">${val}</div></div>`;
-    }).join('');
+    openPage('leaderboard');
 }
 window.openLeaderboard = openLeaderboard;
-window.closeLeaderboard = closeLeaderboard;
-window.loadLeaderboard = loadLeaderboard;
 
 /* ================================================================
    GAME HISTORY
@@ -1892,35 +1909,38 @@ function renderGameHistory(history) {
         cont.innerHTML = '<p style="padding:16px;color:var(--text-muted);text-align:center">Нет игр</p>';
         return;
     }
+    const gameIcons = {
+        mines:'💣', dice:'🎲', x50:'🎡', coinflip:'🪙', slots:'🎰', cases:'📦'
+    };
     cont.innerHTML = history.map(h => {
         const isWin = h.result === 'win';
-        return `<div class="history-item"><div><span style="font-weight:600">${h.game_name||h.game}</span><br><span style="font-size:0.8em;color:var(--text-muted)">${h.bet} монет • ${h.date||''}</span></div><span class="hi-result ${isWin?'win':'loss'}">${isWin?'+':''} ${h.amount} 💰</span></div>`;
+        const icon = gameIcons[h.game] || '🎮';
+        const resultClass = isWin ? 'win' : 'loss';
+        const resultText = isWin ? `+${h.amount}` : `-${h.bet}`;
+        const dateStr = h.date ? new Date(h.date).toLocaleString('ru-RU',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}) : '';
+        return `<div class="history-item">
+          <div style="display:flex;align-items:center;gap:8px">
+            <div style="font-size:1.3em">${icon}</div>
+            <div>
+              <div style="font-size:0.9em;font-weight:600">${h.game_name || h.game}</div>
+              <div style="font-size:0.75em;color:var(--text-muted)">${dateStr}</div>
+            </div>
+          </div>
+          <div style="text-align:right">
+            <div style="font-size:0.85em;color:var(--text-muted)">Ставка: ${h.bet}</div>
+            <div class="hi-result ${resultClass}">${resultText}</div>
+          </div>
+        </div>`;
     }).join('');
 }
+window.loadGameHistory = loadGameHistory;
 
 /* ================================================================
    EVENT SYSTEM
    ================================================================ */
 function displayEvent(event) {
-    const section = document.getElementById('eventSection');
-    if (!event) { section.style.display = 'none'; return; }
-    section.style.display = 'block';
-    document.getElementById('eventName').textContent = event.name || '';
-    document.getElementById('eventDescription').textContent = event.description || '';
-    document.getElementById('eventTime').textContent = event.hours ? ('Осталось: ' + event.hours + ' ч.') : '';
-    const colors = { red:'var(--red)', gold:'#FFD700', green:'var(--green)', blue:'var(--blue)' };
-    const c = colors[event.color] || colors.red;
-    document.getElementById('eventContainer').style.borderColor = c;
-    document.getElementById('eventName').style.color = c;
+    handleEventData(event);
 }
-
-/* ================================================================
-   SHARE STATS
-   ================================================================ */
-function shareStats() {
-    send({ type: 'shareStats' });
-}
-window.shareStats = shareStats;
 
 function handleShareData(data) {
     const text = data.text || '';
@@ -2247,19 +2267,12 @@ socket.on('message', (m)=>{
     x50History: m=>renderX50History(m.history),
     x50CheckResult: onFairResult,
     fairResult: onFairResult,
-    // NEW MESSAGE TYPES
-    levelInfo: m=>updateLevelDisplay(m.level, m.exp, m.exp_needed),
-    cashbackClaimed: m=>{ 
-      updateBalance(m.balance); 
-      setText('cashbackAmount','0'); 
-      spawnConfetti(); 
-    },
-    leaderboardData: renderLeaderboard,
-    gameHistory: m=>renderGameHistory(m.history),
-    eventData: m=>displayEvent(m.event),
-    shareStatsData: handleShareData,
-    adminStats: renderAdminStats,
-    adminPromoCreated: m=>{ notify('success',`Промокод: ${m.code}`, 8000); try{navigator.clipboard.writeText(m.code).catch(()=>{})}catch(e){} },
+    levelInfo: onLevelInfo,
+    cashbackClaimed: onCashbackClaimed,
+    leaderboardData: onLeaderboardData,
+    gameHistory: onGameHistory,
+    eventData: handleEventData,
+    levelUp: onLevelUp,
   };
   const fn = handlers[m.type];
   if(fn) fn(m);
@@ -2277,7 +2290,19 @@ function handleWelcome(m){
   if(av){ $id('headerAvatar').src=av; $id('profileAvatar').src=av; }
   setText('profileName', m.name||'');
   setText('profileId', m.tg_id||'');
-  
+  // level system
+  if(m.level !== undefined) {
+    setText('userLevel', m.level || 1);
+    setText('userExp', m.exp || 0);
+    setText('expNeeded', m.exp_needed || 15);
+    const expPercent = m.exp_needed > 0 ? ((m.exp || 0) / m.exp_needed * 100) : 0;
+    const expBar = $id('expBar');
+    if(expBar) expBar.style.width = expPercent + '%';
+  }
+  // cashback
+  if(m.cashback !== undefined) {
+    setText('cashbackAmount', m.cashback || 0);
+  }
   // ref
   $id('refLinkInput').value = `https://t.me/${BOT_USERNAME}?start=${m.tg_id||''}`;
   setText('refCount', m.refs||0);
@@ -2316,7 +2341,8 @@ function handleWelcome(m){
   
   // build wheel
   buildX50Wheel();
-  
+  // event
+  if(m.event) handleEventData(m.event);
   // hide preloader
   const pl=$id('preloader');
   pl.classList.add('fade-out');
@@ -2335,17 +2361,16 @@ function openPage(p){
   
   // navbar
   $$('.nav-item').forEach(n=>n.classList.remove('active'));
-  $$('.nav-item').forEach(n=>{
-    if(n.dataset.section === p) n.classList.add('active');
-  });
-  
-  // load profile data if needed
-  if(p==='profile'){
+  const navMap = {home:0, games:1, wallet:2, leaderboard:3, profile:4, x50:1, mines:1, dice:1, cases:1, coinflip:1, slots:1, settings:4, fair:4};
+  if(navMap[p]!==undefined) $$('.nav-item')[navMap[p]]?.classList.add('active');
+  // load data based on page
+  if(p==='profile') {
     send({type:'getProfile'});
-    send({type:'getLevelInfo'});
-    loadGameHistory();
+    send({type:'getGameHistory'});
   }
-  
+  if(p==='leaderboard') {
+    loadLeaderboard('balance');
+  }
   // scroll to top
   window.scrollTo({top:0,behavior:'smooth'});
 }
@@ -2985,6 +3010,19 @@ function onProfileData(m){
   S.wager = m.wager||0;
   setText('walletWager', S.wager);
   if(m.ref_link) $id('refLinkInput').value=m.ref_link;
+  // level
+  if(m.level !== undefined) {
+    setText('userLevel', m.level || 1);
+    setText('userExp', m.exp || 0);
+    setText('expNeeded', m.exp_needed || 15);
+    const expPercent = m.exp_needed > 0 ? ((m.exp || 0) / m.exp_needed * 100) : 0;
+    const expBar = $id('expBar');
+    if(expBar) expBar.style.width = expPercent + '%';
+  }
+  // cashback
+  if(m.cashback !== undefined) {
+    setText('cashbackAmount', m.cashback || 0);
+  }
 }
 
 function copyRefLink(){
@@ -3009,6 +3047,145 @@ function activatePromo(){
   send({type:'activatePromo', promo:code});
 }
 window.activatePromo = activatePromo;
+
+function shareStats(){
+  haptic('light');
+  const text = `🎮 Моя статистика в Casino:\n💰 Баланс: ${S.balance}\n🎲 Игр: ${$id('profileGames')?.textContent||0}\n🏆 Выиграно: ${$id('profileWon')?.textContent||0}`;
+  try{
+    if(Telegram?.WebApp) Telegram.WebApp.shareMessage(text);
+    else notify('info', text);
+  }catch(e){ notify('info', text); }
+}
+window.shareStats = shareStats;
+
+/* ================================================================
+   LEVEL SYSTEM
+   ================================================================ */
+function onLevelInfo(m){
+  if(m.level !== undefined) {
+    setText('userLevel', m.level || 1);
+    setText('userExp', m.exp || 0);
+    setText('expNeeded', m.exp_needed || 15);
+    const expPercent = m.exp_needed > 0 ? ((m.exp || 0) / m.exp_needed * 100) : 0;
+    const expBar = $id('expBar');
+    if(expBar) expBar.style.width = expPercent + '%';
+  }
+}
+
+function onLevelUp(m){
+  haptic('heavy');
+  spawnConfetti();
+  showToast(`🎉 Поздравляем! Вы достигли уровня ${m.level}!`, 'success', 5000);
+  setText('userLevel', m.level || 1);
+  setText('userExp', 0);
+  setText('expNeeded', m.exp_needed || 15);
+  const expBar = $id('expBar');
+  if(expBar) expBar.style.width = '0%';
+}
+
+function onCashbackClaimed(m){
+  if(m.error){
+    notify('error', m.error);
+  } else {
+    updateBalance(m.balance || S.balance);
+    setText('cashbackAmount', 0);
+    notify('success', `💸 Кэшбэк ${m.amount} монет получен!`);
+    haptic('medium');
+  }
+}
+
+/* ================================================================
+   LEADERBOARD
+   ================================================================ */
+function switchLeaderboard(lbType){
+  haptic('light');
+  $$('.lb-tab').forEach(t=>t.classList.remove('active'));
+  $$(`.lb-tab[data-lb="${lbType}"]`).forEach(t=>t.classList.add('active'));
+  loadLeaderboard(lbType);
+}
+window.switchLeaderboard = switchLeaderboard;
+
+function loadLeaderboard(lbType){
+  const content = $id('leaderboardContent');
+  if(content) content.innerHTML = '<p style="text-align:center;color:var(--text-muted);padding:32px 16px">Загрузка...</p>';
+  send({type:'getLeaderboard', lb_type:lbType});
+}
+
+function onLeaderboardData(m){
+  const content = $id('leaderboardContent');
+  if(!content) return;
+  if(!m.data || !m.data.length){
+    content.innerHTML = '<p style="text-align:center;color:var(--text-muted);padding:32px 16px">Нет данных</p>';
+    return;
+  }
+  const medals = ['🥇','🥈','🥉'];
+  const colors = ['var(--gradient-gold)','linear-gradient(135deg,#C0C0C0,#E8E8E8)','linear-gradient(135deg,#CD7F32,#FFD700)'];
+  let html = '';
+  m.data.forEach((item,idx)=>{
+    const rank = item.rank || (idx+1);
+    const isTop3 = rank <= 3;
+    const medal = isTop3 ? medals[rank-1] : '';
+    const bgStyle = isTop3 ? `background:${colors[rank-1]};color:#000;font-weight:800` : '';
+    html += `<div class="lb-item" style="${bgStyle}">
+      <div class="lb-rank">${medal||rank}</div>
+      <div class="lb-name">${item.name||'User'}</div>
+      <div class="lb-value">${item.value||0}</div>
+    </div>`;
+  });
+  content.innerHTML = html;
+}
+
+/* ================================================================
+   GAME HISTORY
+   ================================================================ */
+function onGameHistory(m){
+  renderGameHistory(m.games || m.history || []);
+}
+
+/* ================================================================
+   EVENT BANNER
+   ================================================================ */
+let eventTimerInterval = null;
+
+function handleEventData(event){
+  const section = $id('eventSection');
+  const container = $id('eventContainer');
+  if(!section || !container) return;
+  
+  // Clear existing interval
+  if(eventTimerInterval) {
+    clearInterval(eventTimerInterval);
+    eventTimerInterval = null;
+  }
+  
+  if(!event || !event.name){
+    section.style.display = 'none';
+    return;
+  }
+  section.style.display = 'block';
+  setText('eventName', event.name || '');
+  setText('eventDescription', event.description || '');
+  if(event.end_at){
+    const endTime = new Date(event.end_at);
+    const updateTimer = ()=>{
+      const now = new Date();
+      const diff = endTime - now;
+      if(diff <= 0){
+        setText('eventTime', '⏱️ Событие завершено');
+        if(eventTimerInterval) clearInterval(eventTimerInterval);
+        return;
+      }
+      const days = Math.floor(diff / (1000*60*60*24));
+      const hours = Math.floor((diff % (1000*60*60*24)) / (1000*60*60));
+      const mins = Math.floor((diff % (1000*60*60)) / (1000*60));
+      setText('eventTime', `⏱️ Осталось: ${days}д ${hours}ч ${mins}м`);
+    };
+    updateTimer();
+    eventTimerInterval = setInterval(updateTimer, 60000);
+  } else {
+    setText('eventTime', '');
+  }
+}
 
 /* ================================================================
    HISTORY
