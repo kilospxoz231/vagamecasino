@@ -1571,6 +1571,8 @@ body.theme-neon{--blue:#FF006E;--blue-hover:#D4005C;--bg-primary:#0D0D1A;--bg-se
   </div>
 </div>
 
+<!-- ===== PROFILE ===== -->
+
 <!-- ===== FAIR ===== -->
 <div class="page" id="page-fair">
   <div class="section-title"><span class="icon">🛡️</span> Честная Игра</div>
@@ -1604,6 +1606,23 @@ body.theme-neon{--blue:#FF006E;--blue-hover:#D4005C;--bg-primary:#0D0D1A;--bg-se
 </div>
 
 </div><!-- /main-wrapper -->
+
+<!-- LEADERBOARD OVERLAY -->
+<div class="modal-overlay" id="leaderboardOverlay" onclick="if(event.target===this)closeLeaderboard()">
+  <div class="modal-content" style="max-width:500px;max-height:80vh;overflow-y:auto">
+    <button class="modal-close" onclick="closeLeaderboard()">✕</button>
+    <div class="modal-title">🏆 Лидерборд</div>
+    <div class="lb-tabs">
+      <button class="lb-tab active" onclick="loadLeaderboard('balance',this)">💰 Баланс</button>
+      <button class="lb-tab" onclick="loadLeaderboard('level',this)">⚡ Уровень</button>
+      <button class="lb-tab" onclick="loadLeaderboard('wagered',this)">🏅 Вейджер</button>
+    </div>
+    <div id="lbList" style="padding:12px"></div>
+  </div>
+</div>
+
+<!-- CONFETTI CONTAINER -->
+<div class="confetti-container" id="confettiContainer"></div>
 
 <!-- NAVBAR -->
 <nav class="navbar">
@@ -1654,6 +1673,9 @@ const S = {
   // locks
   _btnLocks: new Set(),
 };
+
+// Backward compatibility for SOUNDS variable
+let SOUNDS = localStorage.getItem('sounds') !== 'false';
 
 /* ===== DICE COEFFICIENTS ===== */
 const DICE_DATA = {
@@ -1986,78 +2008,7 @@ function initTelegramWebApp() {
 }
 
 /* ================================================================
-   UPDATED NAVIGATION (with active indicator line)
-   ================================================================ */
-function openPage(p) {
-    document.querySelectorAll('.page').forEach(pg => pg.classList.remove('active'));
-    const id = 'page-' + p;
-    const el = document.getElementById(id);
-    if (el) el.classList.add('active');
-
-    // Update navbar
-    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-    document.querySelectorAll('.nav-item').forEach(n => {
-        if (n.dataset.section === p) n.classList.add('active');
-    });
-
-    // Load data for specific pages
-    if (p === 'profile') {
-        send({ type: 'getProfile' });
-        send({ type: 'getLevelInfo' });
-        loadGameHistory();
-    }
-}
-window.openPage = openPage;
-
-/* ================================================================
-   UPDATED WELCOME HANDLER
-   ================================================================ */
-function handleWelcome(m) {
-    setProfile(m);
-
-    // Level
-    if (m.level !== undefined) {
-        updateLevelDisplay(m.level, m.exp, m.exp_needed);
-    }
-
-    // Cashback
-    if (m.cashback !== undefined) {
-        const cbEl = document.getElementById('cashbackAmount');
-        if (cbEl) cbEl.textContent = m.cashback;
-    }
-
-    // Event
-    if (m.event) {
-        displayEvent(m.event);
-    }
-
-    // Admin panel
-    if (m.role === 1) {
-        const ap = document.getElementById('adminPanel');
-        if (ap) ap.style.display = 'block';
-    }
-
-    // Active mines
-    if (m.activeMines) {
-        initMinesGrid();
-        restoreMinesState(m.activeMines);
-    } else {
-        initMinesGrid();
-    }
-
-    renderX50Init(m.x50_history || []);
-
-    // Hide preloader
-    document.getElementById('preloader').style.display = 'none';
-
-    showToast('Подключение установлено', 'success');
-
-    // Apply saved language
-    setLanguage(currentLang);
-}
-
-/* ================================================================
-   UPDATED PROFILE RENDER (with level info request)
+   NEW MESSAGE TYPES (merged into main router below)
    ================================================================ */
 function renderProfileData(m) {
     // Original profile data
@@ -2296,15 +2247,19 @@ socket.on('message', (m)=>{
     x50History: m=>renderX50History(m.history),
     x50CheckResult: onFairResult,
     fairResult: onFairResult,
-    // New message types
+    // NEW MESSAGE TYPES
     levelInfo: m=>updateLevelDisplay(m.level, m.exp, m.exp_needed),
-    cashbackClaimed: m=>{ updateBalance(m.balance); setText('cashbackAmount','0'); spawnConfetti(); },
+    cashbackClaimed: m=>{ 
+      updateBalance(m.balance); 
+      setText('cashbackAmount','0'); 
+      spawnConfetti(); 
+    },
     leaderboardData: renderLeaderboard,
     gameHistory: m=>renderGameHistory(m.history),
     eventData: m=>displayEvent(m.event),
     shareStatsData: handleShareData,
     adminStats: renderAdminStats,
-    adminPromoCreated: m=>{ notify('success',`Промокод: ${m.code}`,8000); try{navigator.clipboard.writeText(m.code)}catch(e){} },
+    adminPromoCreated: m=>{ notify('success',`Промокод: ${m.code}`, 8000); try{navigator.clipboard.writeText(m.code).catch(()=>{})}catch(e){} },
   };
   const fn = handlers[m.type];
   if(fn) fn(m);
@@ -2316,29 +2271,60 @@ function handleWelcome(m){
   S.tgId = m.tg_id;
   S.wager = m.wager || 0;
   updateBalance(m.balance);
+  
   // avatar
   const av = m.avatar ? (m.avatar.startsWith('http') ? m.avatar : SOCKET_URL+'/'+m.avatar) : '';
   if(av){ $id('headerAvatar').src=av; $id('profileAvatar').src=av; }
   setText('profileName', m.name||'');
   setText('profileId', m.tg_id||'');
+  
   // ref
   $id('refLinkInput').value = `https://t.me/${BOT_USERNAME}?start=${m.tg_id||''}`;
   setText('refCount', m.refs||0);
   setText('refEarned', m.ref_earned||0);
   setText('refAvailable', m.ref_available||0);
   setText('walletWager', S.wager);
+  
+  // Level
+  if (m.level !== undefined) {
+    updateLevelDisplay(m.level, m.exp, m.exp_needed);
+  }
+  
+  // Cashback
+  if (m.cashback !== undefined) {
+    setText('cashbackAmount', m.cashback);
+  }
+  
+  // Event
+  if (m.event) {
+    displayEvent(m.event);
+  }
+  
+  // Admin panel
+  if (m.role === 1) {
+    const ap = $id('adminPanel');
+    if (ap) ap.style.display = 'block';
+  }
+  
   // x50
   renderX50History(m.x50_history||[]);
   if(m.x50_bets) m.x50_bets.forEach(b=>addX50Bet(b));
+  
   // active mines
   if(m.activeMines) restoreMines(m.activeMines);
   else initMinesGrid();
+  
   // build wheel
   buildX50Wheel();
+  
   // hide preloader
   const pl=$id('preloader');
   pl.classList.add('fade-out');
   setTimeout(()=>pl.style.display='none', 500);
+  
+  // Apply saved language
+  const lang = localStorage.getItem('casino_lang') || 'ru';
+  setLanguage(lang);
 }
 
 /* ===== NAVIGATION ===== */
@@ -2346,12 +2332,20 @@ function openPage(p){
   haptic('light');
   $$('.page').forEach(pg=>pg.classList.remove('active'));
   const el=$id('page-'+p); if(el) el.classList.add('active');
+  
   // navbar
   $$('.nav-item').forEach(n=>n.classList.remove('active'));
-  const navMap = {home:0, wallet:1, profile:2, settings:3};
-  if(navMap[p]!==undefined) $$('.nav-item')[navMap[p]]?.classList.add('active');
+  $$('.nav-item').forEach(n=>{
+    if(n.dataset.section === p) n.classList.add('active');
+  });
+  
   // load profile data if needed
-  if(p==='profile') send({type:'getProfile'});
+  if(p==='profile'){
+    send({type:'getProfile'});
+    send({type:'getLevelInfo'});
+    loadGameHistory();
+  }
+  
   // scroll to top
   window.scrollTo({top:0,behavior:'smooth'});
 }
@@ -3172,25 +3166,5 @@ init();
 
 })();
 </script>
-<!-- LEADERBOARD MODAL -->
-<div class="modal-overlay" id="leaderboardOverlay" onclick="if(event.target===this)closeLeaderboard()" style="display:none">
-    <div class="modal-content" style="max-width:550px;padding:0;max-height:80vh;overflow:hidden">
-        <div style="padding:20px 24px;border-bottom:1px solid var(--border-color);display:flex;justify-content:space-between;align-items:center">
-            <h2 style="font-size:1.3em;font-weight:700">🏆 <span data-i18n="leaderboard">Лидерборд</span></h2>
-            <button onclick="closeLeaderboard()" style="font-size:1.5em;cursor:pointer;background:none;border:none;color:var(--text-muted)">✕</button>
-        </div>
-        <div class="lb-tabs">
-            <button class="lb-tab active" onclick="loadLeaderboard('balance',this)" data-i18n="lb_balance">💰 Баланс</button>
-            <button class="lb-tab" onclick="loadLeaderboard('level',this)" data-i18n="lb_level">⚡ Уровень</button>
-            <button class="lb-tab" onclick="loadLeaderboard('wagered',this)" data-i18n="lb_wagered">🏅 Вейджер</button>
-        </div>
-        <div class="lb-list" id="lbList" style="padding:12px;max-height:50vh;overflow-y:auto">
-            <p style="text-align:center;color:var(--text-muted);padding:20px" data-i18n="loading">Загрузка...</p>
-        </div>
-    </div>
-</div>
-
-<!-- CONFETTI -->
-<div class="confetti-container" id="confettiContainer"></div>
 </body>
 </html>
