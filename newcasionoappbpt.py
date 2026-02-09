@@ -125,12 +125,9 @@ def query_one(sql, params=None):
         cursor = conn.cursor(dictionary=True)
         cursor.execute(sql, params or [])
         result = cursor.fetchone()
+        cursor.close()
         return result
     finally:
-        try:
-            cursor.close()
-        except Exception:
-            pass
         conn.close()
 
 
@@ -140,12 +137,9 @@ def query_all(sql, params=None):
         cursor = conn.cursor(dictionary=True)
         cursor.execute(sql, params or [])
         results = cursor.fetchall()
+        cursor.close()
         return results
     finally:
-        try:
-            cursor.close()
-        except Exception:
-            pass
         conn.close()
 
 
@@ -156,12 +150,9 @@ def query_exec(sql, params=None):
         cursor.execute(sql, params or [])
         last_id = cursor.lastrowid
         conn.commit()
+        cursor.close()
         return last_id
     finally:
-        try:
-            cursor.close()
-        except Exception:
-            pass
         conn.close()
 
 
@@ -3390,8 +3381,9 @@ async def admin_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     elif data.startswith('admin_toggle_game_'):
         game_name = data.replace('admin_toggle_game_', '')
         # Whitelist validation to prevent SQL injection
-        if game_name not in ALLOWED_GAME_SETTINGS:
-            await query.answer('❌ Недопустимое значение', show_alert=True)
+        allowed_fields = ['mines', 'cube', 'x50', 'cases_game', 'coinflip', 'slots']
+        if game_name not in allowed_fields:
+            await query.answer('Недопустимое поле', show_alert=True)
             return
         settings = get_settings()
         if settings and game_name in settings:
@@ -3405,8 +3397,9 @@ async def admin_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     elif data.startswith('admin_toggle_fin_'):
         field = data.replace('admin_toggle_fin_', '')
         # Whitelist validation to prevent SQL injection
-        if field not in ALLOWED_FIN_SETTINGS:
-            await query.answer('❌ Недопустимое значение', show_alert=True)
+        allowed_fields = ['deposits_enabled', 'withdrawals_enabled']
+        if field not in allowed_fields:
+            await query.answer('Недопустимое поле', show_alert=True)
             return
         settings = get_settings()
         if settings and field in settings:

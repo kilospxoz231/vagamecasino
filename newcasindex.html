@@ -1671,11 +1671,11 @@ body.theme-neon{--blue:#FF006E;--blue-hover:#D4005C;--bg-primary:#0D0D1A;--bg-se
 
 <!-- NAVBAR -->
 <nav class="navbar">
-    <a href="#" class="nav-item active" data-section="home" onclick="openPage('home')"><span class="icon" style="font-size:1.5em">🏠</span><span class="label">Главная</span></a>
-    <a href="#" class="nav-item" data-section="games" onclick="openPage('games')"><span class="icon" style="font-size:1.5em">🎮</span><span class="label">Игры</span></a>
-    <a href="#" class="nav-item" data-section="wallet" onclick="openPage('wallet')"><span class="icon" style="font-size:1.5em">💰</span><span class="label">Кошелёк</span></a>
-    <a href="#" class="nav-item" data-section="leaderboard" onclick="openPage('leaderboard')"><span class="icon" style="font-size:1.5em">🏆</span><span class="label">Рейтинг</span></a>
-    <a href="#" class="nav-item" data-section="profile" onclick="openPage('profile')"><span class="icon" style="font-size:1.5em">👤</span><span class="label">Профиль</span></a>
+    <a href="#" class="nav-item active" data-section="home" onclick="openPage('home')"><span class="icon" style="font-size:1.5em">🏠</span><span class="label" data-i18n="nav_home">Главная</span></a>
+    <a href="#" class="nav-item" data-section="games" onclick="openPage('x50')"><span class="icon" style="font-size:1.5em">🎮</span><span class="label" data-i18n="nav_games">Игры</span></a>
+    <a href="#" class="nav-item" data-section="leaderboard" onclick="openLeaderboard()"><span class="icon" style="font-size:1.5em">🏆</span><span class="label" data-i18n="nav_leaderboard">Топ</span></a>
+    <a href="#" class="nav-item" data-section="profile" onclick="openPage('profile')"><span class="icon" style="font-size:1.5em">👤</span><span class="label" data-i18n="nav_profile">Профиль</span></a>
+    <a href="#" class="nav-item" data-section="settings" onclick="openPage('settings')"><span class="icon" style="font-size:1.5em">⚙️</span><span class="label" data-i18n="nav_settings">Настройки</span></a>
 </nav>
 
 <!-- ============================================================
@@ -2028,7 +2028,81 @@ function initTelegramWebApp() {
 }
 
 /* ================================================================
-   NEW MESSAGE TYPES (merged into main router below)
+   UPDATED NAVIGATION (with active indicator line)
+   ================================================================ */
+function openPage(p) {
+    document.querySelectorAll('.page').forEach(pg => pg.classList.remove('active'));
+    const id = 'page-' + p;
+    const el = document.getElementById(id);
+    if (el) el.classList.add('active');
+
+    // Update navbar
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(n => {
+        if (n.dataset.section === p) n.classList.add('active');
+    });
+
+    // Load data for specific pages
+    if (p === 'profile') {
+        send({ type: 'getProfile' });
+        send({ type: 'getLevelInfo' });
+        loadGameHistory();
+    }
+}
+window.openPage = openPage;
+
+/* ================================================================
+   UPDATED WELCOME HANDLER
+   ================================================================ */
+function handleWelcome(m) {
+    setProfile(m);
+
+    // Level
+    if (m.level !== undefined) {
+        updateLevelDisplay(m.level, m.exp, m.exp_needed);
+    }
+
+    // Cashback
+    if (m.cashback !== undefined) {
+        const cbEl = document.getElementById('cashbackAmount');
+        if (cbEl) cbEl.textContent = m.cashback;
+    }
+
+    // Event
+    if (m.event) {
+        displayEvent(m.event);
+    } else {
+        // Request event data if not included in welcome
+        send({type:'getEvent'});
+    }
+
+    // Admin panel
+    if (m.role === 1) {
+        const ap = document.getElementById('adminPanel');
+        if (ap) ap.style.display = 'block';
+    }
+
+    // Active mines
+    if (m.activeMines) {
+        initMinesGrid();
+        restoreMinesState(m.activeMines);
+    } else {
+        initMinesGrid();
+    }
+
+    renderX50Init(m.x50_history || []);
+
+    // Hide preloader
+    document.getElementById('preloader').style.display = 'none';
+
+    showToast('Подключение установлено', 'success');
+
+    // Apply saved language
+    setLanguage(currentLang);
+}
+
+/* ================================================================
+   UPDATED PROFILE RENDER (with level info request)
    ================================================================ */
 function renderProfileData(m) {
     // Original profile data
@@ -2358,18 +2432,20 @@ function openPage(p){
   haptic('light');
   $$('.page').forEach(pg=>pg.classList.remove('active'));
   const el=$id('page-'+p); if(el) el.classList.add('active');
-  
-  // navbar
+  // navbar - map pages to navbar indices
   $$('.nav-item').forEach(n=>n.classList.remove('active'));
-  const navMap = {home:0, games:1, wallet:2, leaderboard:3, profile:4, x50:1, mines:1, dice:1, cases:1, coinflip:1, slots:1, settings:4, fair:4};
+  // Home=0, Games=1, Leaderboard=2, Profile=3, Settings=4
+  const navMap = {home:0, x50:1, mines:1, dice:1, cases:1, coinflip:1, slots:1, profile:3, settings:4, wallet:3, fair:4};
   if(navMap[p]!==undefined) $$('.nav-item')[navMap[p]]?.classList.add('active');
-  // load data based on page
+  // load profile data if needed
   if(p==='profile') {
     send({type:'getProfile'});
-    send({type:'getGameHistory'});
+    loadGameHistory();
+    send({type:'getLevelInfo'});
   }
-  if(p==='leaderboard') {
-    loadLeaderboard('balance');
+  // load event data on home page
+  if(p==='home') {
+    send({type:'getEvent'});
   }
   // scroll to top
   window.scrollTo({top:0,behavior:'smooth'});
@@ -2982,6 +3058,7 @@ function onDepositInvoice(m){
     notify('info','Оплатите счёт в открывшемся окне');
   } else notify('error','Ошибка создания счёта');
 }
+window.showDepositInvoice = onDepositInvoice; // alias for socket handler
 
 function doWithdraw(){
   const coins=parseInt($id('withdrawCoins').value||0);
