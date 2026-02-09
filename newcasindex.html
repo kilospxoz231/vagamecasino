@@ -1787,24 +1787,10 @@ function toggleFastAnim() {
     showToast(FAST_ANIM ? 'Быстрые анимации включены' : 'Быстрые анимации выключены', 'info');
 }
 
-function toggleSoundSetting() {
-    SOUNDS = !SOUNDS;
-    localStorage.setItem('sounds', SOUNDS ? 'true' : 'false');
-    const btn = document.getElementById('settingSoundToggle');
-    if (btn) btn.classList.toggle('active', SOUNDS);
-    const hdrBtn = document.getElementById('soundBtn');
-    if (hdrBtn) hdrBtn.classList.toggle('active', SOUNDS);
-    showToast(SOUNDS ? 'Звуки включены' : 'Звуки выключены', 'info');
-}
 window.toggleFastAnim = toggleFastAnim;
-window.toggleSoundSetting = toggleSoundSetting;
 
 // Restore toggles on load
 (function restoreToggles() {
-    if (SOUNDS) {
-        const s1 = document.getElementById('settingSoundToggle'); if (s1) s1.classList.add('active');
-        const s2 = document.getElementById('soundBtn'); if (s2) s2.classList.add('active');
-    }
     if (FAST_ANIM) {
         const f = document.getElementById('settingFastAnim'); if (f) f.classList.add('active');
     }
@@ -2075,64 +2061,6 @@ function handleWelcome(m) {
 }
 
 /* ================================================================
-   UPDATED MESSAGE ROUTER — add new cases
-   ================================================================ */
-// Add these to the switch(m.type) inside socket.on('message'):
-// Find the existing switch and add these cases:
-
-const _originalMessageHandler = socket.listeners('message')[0];
-socket.off('message');
-socket.on('message', (m) => {
-    if (!m || !m.type) return;
-    switch(m.type) {
-        case 'welcome': handleWelcome(m); break;
-        case 'updateBalance': updateBalance(m.balance); break;
-        case 'alert': notify(m.type_alert, m.alert_message); break;
-        case 'createMines': serverCreateMines(m); break;
-        case 'playMines': serverPlayMines(m); break;
-        case 'cashoutMines': serverCashoutMines(m); break;
-        case 'minesCheckResult': serverMinesCheck(m); break;
-        case 'betCubeResult': serverDiceResult(m); break;
-        case 'diceCheckResult': serverDiceCheck(m); break;
-        case 'coinflipResult': serverCoinflipResult(m); break;
-        case 'slotsResult': serverSlotsResult(m); break;
-        case 'caseResult': serverCaseResult(m); break;
-        case 'depositInvoice': showDepositInvoice(m); break;
-        case 'depositSuccess': onDepositSuccess(m); break;
-        case 'withdrawSuccess': showToast('Заявка на вывод создана!', 'success'); updateBalance(m.balance); break;
-        case 'withdrawCancelled': showToast('Вывод отменён', 'info'); updateBalance(m.balance); break;
-        case 'refWithdrawSuccess': onRefWithdrawSuccess(m); break;
-        case 'promoSuccess': onPromoSuccess(m); break;
-        case 'historyTransactions': renderHistory(m.history); break;
-        case 'profileData': renderProfileData(m); break;
-        case 'rollX50': handleX50Roll(m); break;
-        case 'addBetX50': addX50BetToUI(m.bet); break;
-        case 'resetX50': resetX50UI(); break;
-        case 'setTimesX50': updateX50Timer(m); break;
-        case 'x50History': renderX50History(m.history); break;
-        case 'x50CheckResult': showFairResult(m); break;
-        case 'fairResult': showFairResult(m); break;
-        // === NEW TYPES ===
-        case 'levelInfo': updateLevelDisplay(m.level, m.exp, m.exp_needed); break;
-        case 'cashbackClaimed':
-            updateBalance(m.balance);
-            document.getElementById('cashbackAmount').textContent = '0';
-            spawnConfetti();
-            break;
-        case 'leaderboardData': renderLeaderboard(m); break;
-        case 'gameHistory': renderGameHistory(m.history); break;
-        case 'eventData': displayEvent(m.event); break;
-        case 'shareStatsData': handleShareData(m); break;
-        case 'adminStats': renderAdminStats(m); break;
-        case 'adminPromoCreated':
-            showToast('Промокод: ' + m.code, 'success', 8000);
-            try { navigator.clipboard.writeText(m.code); } catch(e){}
-            break;
-        default: break;
-    }
-});
-
-/* ================================================================
    UPDATED PROFILE RENDER (with level info request)
    ================================================================ */
 function renderProfileData(m) {
@@ -2372,6 +2300,15 @@ socket.on('message', (m)=>{
     x50History: m=>renderX50History(m.history),
     x50CheckResult: onFairResult,
     fairResult: onFairResult,
+    // New message types
+    levelInfo: m=>updateLevelDisplay(m.level, m.exp, m.exp_needed),
+    cashbackClaimed: m=>{ updateBalance(m.balance); setText('cashbackAmount','0'); spawnConfetti(); },
+    leaderboardData: renderLeaderboard,
+    gameHistory: m=>renderGameHistory(m.history),
+    eventData: m=>displayEvent(m.event),
+    shareStatsData: handleShareData,
+    adminStats: renderAdminStats,
+    adminPromoCreated: m=>{ notify('success',`Промокод: ${m.code}`,8000); try{navigator.clipboard.writeText(m.code)}catch(e){} },
   };
   const fn = handlers[m.type];
   if(fn) fn(m);
@@ -3207,6 +3144,7 @@ function initBanner(){
   // auto-rotate
   setInterval(()=>{idx=(idx+1)%slides.length;render();},5000);
 }
+window.initBannerCarousel = initBanner; // Alias for compatibility
 
 /* ================================================================
    INITIALIZATION
